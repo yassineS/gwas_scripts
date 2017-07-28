@@ -4,7 +4,7 @@
 ###### GWAS codebook (Coleman et al, 2015,  Briefings in Functional Genomics), version 1.0.0
 ##### Please address questions, comments and improvements to [my google group](https://groups.google.com/forum/#!forum/gwas-questions)
 ##### If you use the scripts and advice herein, please consider citing our paper, the full text of which is available on the publisher's website: 
-#####Quality control, imputation and analysis of genome-wide genotyping data from the Illumina HumanCoreExome microarray. Jonathan R. I. Coleman; Jack Euesden; Hamel Patel; Amos A. Folarin; Stephen Newhouse; Gerome Breen. Briefings in Functional Genomics 2015; [doi:10.1093/bfgp/elv037](http://bfg.oxfordjournals.org/content/early/2015/10/05/bfgp.elv037)
+##### Quality control, imputation and analysis of genome-wide genotyping data from the Illumina HumanCoreExome microarray. Jonathan R. I. Coleman; Jack Euesden; Hamel Patel; Amos A. Folarin; Stephen Newhouse; Gerome Breen. Briefings in Functional Genomics 2015; [doi:10.1093/bfgp/elv037](http://bfg.oxfordjournals.org/content/early/2015/10/05/bfgp.elv037)
 
 
 The scripts in this repo are referenced in the publication referenced above, which provides a straight-forward guide to the quality control, imputation and analysis of genome-wide genotype data. Scripts can be tested using the toy PLINK dataset kindly provided by Shaun Purcell on the PLINK 1.07 website: [example.zip](http://pngu.mgh.harvard.edu/~purcell/plink/dist/example.zip).
@@ -27,13 +27,13 @@ Within this protocol, the following software is used:
 
 The protocol runs in a UNIX environment, and makes use of some of the basic software of the UNIX operating system. It should run on a Mac, but not in Windows. Most sections are designed to be usable simply by pasting into the command line – variables are set when each command is run, and should be straight-forward to modify.
 
-#Procedure#
+# Procedure
 
-#####Recalling and rare-variant calling
+##### Recalling and rare-variant calling
 
 Not covered by this protocol, see http://confluence.brc.iop.kcl.ac.uk:8090/x/4AAm, which presents best-practice for recalling the raw genotype data using Illumina GenomeStudio, and https://github.com/KHP-Informatics/chip_gt, which implements and compares the results of [ZCall] (https://github.com/jigold/zCall) and [Opticall] (https://www.sanger.ac.uk/resources/software/opticall/). [This Nature Protocols paper](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4441213/)  is also very good. 
 
-#####Reformat of data from the rare caller pipeline
+##### Reformat of data from the rare caller pipeline
 
 The Human Core Exome array contains some SNPs called "SNP…" In order to make ZCall run effectively, it is necessary to change the name of these SNPs, e.g. to "xxx…" This can be done using the UNIX program sed
 
@@ -43,7 +43,7 @@ sed 's/SNP/xxx/g' < rootname.report > rootname.updated.report
 
 Following the implementation of the rare caller pipeline, it is recommended to review the concordance between ZCall and Opticall − concordance is expected to be high (>99%). 
  
-#####Define names and locations of important files and software:
+##### Define names and locations of important files and software:
 
 ```{UNIX}
 printf "root=/path/to/rootname
@@ -64,7 +64,7 @@ File formats are the [PLINK file formats] (http://pngu.mgh.harvard.edu/~purcell/
 
 NB: not all of these files may be relevant to your study.
 
-#####Review the PLINK binary (.bed, .bim, .fam) files from Exome-chip pipeline
+##### Review the PLINK binary (.bed, .bim, .fam) files from Exome-chip pipeline
 
 _Check individuals_
 
@@ -78,7 +78,7 @@ _Check SNPs_
 less $root.bim
 ```
 
-#####Update files
+##### Update files
 
 Phenotypes, individual names, genders, or SNP alleles may be lost in preparatory steps. These can be updated using external files.
 
@@ -152,7 +152,7 @@ $plink \
 --out $root.kept_samples
 ```
 
-#####Filter for common SNPs
+##### Filter for common SNPs
 
 ```{PLINK}
 $plink \
@@ -165,7 +165,7 @@ $plink \
 This assumes no updates were made, otherwise modify the --bfile command to point to that file (e.g. $root.updated_names).
 
 
-#####Filter for call rate iteratively 
+##### Filter for call rate iteratively 
 
 ```{bash}
 sh ./Iterative_Missingness.sh [begin] [final] [steps] 
@@ -177,7 +177,7 @@ sh ./Iterative_Missingness.sh 90 99 1
 ```
 
 
-#####Review call rates to ensure all missing SNPs and individuals have been dropped
+##### Review call rates to ensure all missing SNPs and individuals have been dropped
 
 _Generate files for individual call rates and variant vall rates._
 
@@ -203,7 +203,7 @@ sort -k 6 -gr $root.filtered_missing.imiss | head
 ```
 Check no individuals above threshold remain in column 6 (proportion missing).
 
-#####Assess SNPs for deviation from Hardy-Weinberg Equilibrium
+##### Assess SNPs for deviation from Hardy-Weinberg Equilibrium
 
 _--hardy calculates HWE test p-values:_
 
@@ -225,7 +225,7 @@ $plink \
 ```
 NB: in case-control datasets, the default behaviour of hwe is to work on controls only
 
-#####Prune data file for linkage disequilibrium 
+##### Prune data file for linkage disequilibrium 
 
 _Using a window of 1500 variants and a shift of 150 variants between windows, with an r2 cut-off of 0.2:_
 
@@ -265,7 +265,7 @@ $plink \
 --out $root.LD_three
 ```
 
-#####Add phenotype to differentiate groups
+##### Add phenotype to differentiate groups
 
 _E.g. Add site of collection ("Site") from an external pheotype file:_
 
@@ -278,7 +278,7 @@ $plink \
 --out  $root.LD_four
 ```
 
-#####Compare genotypic and phenotypic gender
+##### Compare genotypic and phenotypic gender
 
 _Ensure there is a separate XY region for the pseudoautosomal region on X:_ 
 
@@ -322,7 +322,7 @@ $plink \
 --out $root.sexcheck_cleaned
 ```
 
-#####Pairwise identical-by-descent (IBD) check
+##### Pairwise identical-by-descent (IBD) check
 
 ```{PLINK}
 $plink \
@@ -368,7 +368,7 @@ $plink \
 --out $root.IBD_cleaned
 ```
 
-#####Population stratification by principal component analysis in EIGENSOFT
+##### Population stratification by principal component analysis in EIGENSOFT
 
 Consult [https://sites.google.com/site/mikeweale/software/eigensoftplus].
 
@@ -544,7 +544,7 @@ Calculate association (short version):
 
 Include components significantly associated with outcome as covariates in the final analysis, or add PCs in turn until inflation falls to an accepted level (lambda ≈ 1).
 
-#####Optional (but useful): plot individuals on components drawn from the HapMap reference populations to assess likely ancestry groupings. 
+##### Optional (but useful): plot individuals on components drawn from the HapMap reference populations to assess likely ancestry groupings. 
 
 Details of this procedure can be found at [Timothee Flutre's OpenWetWare]
 (http://openwetware.org/wiki/User:Timothee_Flutre/Notebook/Postdoc/2012/01/22).
@@ -570,7 +570,7 @@ _Use keepids.txt at this section:_
 
 More populations now exist than those listed in Flutre’s script; these can be obtained in the same manner.	
  
-#####Heterozygosity Test
+##### Heterozygosity Test
 
 _Test for unusual patterns of genome-wide heterogeneity in LD-pruned data_
 
@@ -601,7 +601,7 @@ $plink \
 --out $root.het_cleaned
 ```
 
-#####Imputation
+##### Imputation
 
 *Consult [http://genome.sph.umich.edu/wiki/IMPUTE2:_1000_Genomes_Imputation_Cookbook] and [https://mathgen.stats.ox.ac.uk/impute/prephasing_and_imputation_with_impute2.tgz]*
 
@@ -786,7 +786,7 @@ At this point, it is recommended to gzip all IMPUTE2 files - note that this will
 gzip *impute2* 
 ```
 
-#####Post-imputation quality control	
+##### Post-imputation quality control	
 
 *Remove rare SNPs depending on sample size and dataset characteristics*
 
@@ -833,7 +833,7 @@ Some rs IDs are imperfectly mapped, resulting in duplications with imputed IDs, 
 sh ./DropDuplicatedPositions.sh 
 ```
 
-#####Association testing in PLINK/PLINK2
+##### Association testing in PLINK/PLINK2
 
 *Generate covariates file, merging $covar and $root.dataname_pop_strat_includes.pca.evec (output from SMARTPCA) files*
 
@@ -881,7 +881,7 @@ Run BLAT, [available on the UCSC Genome Browser](https://genome.ucsc.edu/cgi-bin
 
 All association details here assume an additive model – see PLINK website to implement other models (but see [Knight and Lewis, 2012](http://www.ncbi.nlm.nih.gov/pubmed/22383645) for discussion of statistical issues of performing tests using multiple models). More association tests are available in PLINK and PLINK2.
  
-#####Using GCTA for Genomic-relatedness-matrix Restricted Maximum Likelihood (GREML) and Mixed Linear Model Association (MLMA)
+##### Using GCTA for Genomic-relatedness-matrix Restricted Maximum Likelihood (GREML) and Mixed Linear Model Association (MLMA)
 
 _Make GRM_
 
@@ -965,7 +965,7 @@ sed -i '1d' $root.post_imputation_final_mlma_analysis_X.mlma
 cat $root.post_imputation_final_mlma_analysis.mlmaloco $root.post_imputation_final_mlma_analysis_X.mlma >  $root.post_imputation_final_mlma_analysis_combined.mlmaloco
 ```
 
-#####SNP Clumping to identify independent hits
+##### SNP Clumping to identify independent hits
 
 _Limit associations to lowest p-value in each region of linkage disequilibrium_ 
 
@@ -987,7 +987,7 @@ $plink \
   
 The options given here will generate clumps of all SNPs in LD (above R2 = 0.25), with a maximum size of 500kb, considering all SNPs regardless of p-value  
 
-#####Annotation of Results
+##### Annotation of Results
 
 *Download all RefSeq genes from [UCSC](https://genome.ucsc.edu/)*
 
@@ -1027,7 +1027,7 @@ ranges=glist-hg19 \
 
 Alternatively, export results to a web tool such as [http://jjwanglab.org/gwasrap]
 
-#####Plot Manhattan and QQ plots
+##### Plot Manhattan and QQ plots
 
 _Select top million hits for Manhattan plot_
 
